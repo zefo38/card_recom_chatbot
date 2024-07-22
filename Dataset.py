@@ -50,11 +50,11 @@ class ChatbotDataset(Dataset):
                 a_len = self.max_len - q_len
             a_toked = a_toked[:a_len]
             a_len = len(a_toked)
-        if a_len + a_len > self.max_len:
+        if q_len + a_len > self.max_len:
             a_len = self.max_len - q_len
             
             if a_len <= 0:
-                q_toked = a_toked[-(int(self.max_len / 2)) :]
+                q_toked = q_toked[-(int(self.max_len / 2)) :]
                 q_len = len(q_toked)
                 a_len = self.max_len = q_len
             a_toked = a_toked[:a_len]
@@ -71,7 +71,7 @@ class ChatbotDataset(Dataset):
         while len(token_ids) < self.max_len:
             token_ids += [self.tokenizer.pad_token_id]
         
-        return (token_ids, mask, labels_ids)
+        return (token_ids, np.array(mask), labels_ids)
     
     def collate_batch(batch):
         data = [item[0] for item in batch]
