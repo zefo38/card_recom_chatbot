@@ -55,4 +55,6 @@ for epoch in range(epoch):
         avg_loss = loss.sum() / mask.sum()
         avg_loss.backward()
         optimizer.step()
+    print(f"epoch {epoch} loss {avg_loss}")
+    model.save_pretrained("./basic_model")
 print("end")
