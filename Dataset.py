@@ -71,7 +71,7 @@ class ChatbotDataset(Dataset):
         while len(token_ids) < self.max_len:
             token_ids += [self.tokenizer.pad_token_id]
         
-        return (token_ids, np.array(mask), labels_ids)
+        return (token_ids, mask, labels_ids)
     
     def collate_batch(batch):
         data = [item[0] for item in batch]

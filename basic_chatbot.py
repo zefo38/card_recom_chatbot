@@ -46,7 +46,7 @@ for epoch in range(epoch):
     for batch_idx, samples in enumerate(train_dataloader):
         optimizer.zero_grad()
         token_ids, mask, label = samples
-        samples = samples.to(device)
+        token_ids, mask, label = token_ids.to(device), mask.to(device), label.to(device)
         out = model(token_ids)
         out = out.logits
         mask_3d = mask.unsqueeze(dim = 2).repeat_interleave(repeats = out.shape[2], dim=2)
