@@ -7,9 +7,12 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from transformers import PreTrainedTokenizerFast
 
+Q_TKN = '<usr>'
+A_TKN = '<sys>'
 BOS = "</s>"
 EOS = "</s>"
 PAD = "<pad>"
+SENT = '<unused1>'
 MASK = "<unused0>"
 tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2", bos_token=BOS, eos_token=EOS, unk_token="<unk>", pad_token=PAD, mask_token=MASK,)
 
@@ -19,6 +22,7 @@ class ChatbotDataset(Dataset):
         self.max_len = max_len
         self.q_token = Q_TKN
         self.a_token = A_TKN
+        self.sent_token = SENT
         self.eos = EOS
         self.mask = MASK
         self.tokenizer = tokenizer
