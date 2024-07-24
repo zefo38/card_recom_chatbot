@@ -3,3 +3,4 @@
 *.safetensors
 __pycache__/
 basic_model/
+intent_data/
