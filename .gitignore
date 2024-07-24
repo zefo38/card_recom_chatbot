@@ -1,3 +1,5 @@
 *.csv
 *.json
 *.safetensors
+__pycache__/
+basic_model/

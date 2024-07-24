@@ -1,8 +1,5 @@
 import numpy as np
 import pandas as pd
-from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.core import LightningModule
 from torch.utils.data import DataLoader, Dataset
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 import torch
@@ -42,7 +39,7 @@ model.to(device)
 model.train()
 
 criterion = torch.nn.CrossEntropyLoss(reduction = "none")
-optimizer = torch.optim.Adam(model.parameters(), lr = args.lr)
+optimizer = AdamW(model.parameters(), lr = args.lr)
 
 
 print("start")
