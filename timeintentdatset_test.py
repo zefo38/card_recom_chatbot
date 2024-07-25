@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
-from TimeIntentDataset import timeintentdataset
+from IntentDataset import intentdataset
 from transformers import PreTrainedTokenizerFast
 from torch.utils.data import Dataset, DataLoader
 import os
 import json
 
 
-path = "./Training/labeled"
+path = "./train"
 files = os.listdir(path)
 files
 js_list = []
@@ -30,6 +30,6 @@ tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
                                                     pad_token = PAD, mask_token = MASK)
 
 data = js_list
-train_set = timeintentdataset(data, tokenizer, max_length = 128)
+train_set = intentdataset(data, tokenizer, max_length = 128)
 train_loader = DataLoader(train_set, batch_size = 32, num_workers = 0, shuffle = True)
-print(train_loader)
+print(train_set)

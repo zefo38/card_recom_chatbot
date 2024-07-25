@@ -34,6 +34,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 train_set = ChatbotDataset(data, max_len = 40)
 
 train_dataloader = DataLoader(train_set, batch_size = 32, num_workers = 0, shuffle = True, collate_fn = ChatbotDataset.collate_batch,)
+print(train_set)
 
 model.to(device)
 model.train()
