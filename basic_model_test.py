@@ -10,7 +10,7 @@ MASK = "<unused0>"
 SENT = "<unused1>"
 
 tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2", bos_token = BOS, eos_token = EOS, unk_token = "<unk>", pad_token = PAD, mask_token = MASK)
-model = GPT2LMHeadModel.from_pretrained("C:/Users/jayiu/card_recsys_chatbot/basic_model")
+model = GPT2LMHeadModel.from_pretrained("C:/Users/user/card_chatbot/basic_model")
 with torch.no_grad():
     while 1:
         q = input("user > ").strip()

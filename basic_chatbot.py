@@ -28,7 +28,7 @@ tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
                                                     pad_token = PAD, mask_token = MASK)
 model = GPT2LMHeadModel.from_pretrained('skt/kogpt2-base-v2')
 
-data = pd.read_csv('./ChatBotData.csv')
+data = pd.read_csv('./data.csv')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 train_set = ChatbotDataset(data, max_len = 40)
