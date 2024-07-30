@@ -1,6 +1,6 @@
 import langchain
 import transformers
-from CsvLoader import csvload
+from DocLoader import docload
 from langchain import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.llms import HuggingFacePipeline
@@ -15,8 +15,8 @@ model_id = 'MLP-KTLim/llama-3-Korean-Bllossom-8B'
 path = './consumer_data.csv'
 encoding = 'utf-8'
 source_column = '고객번호'
-c = csvload(path, encoding, source_column)
-data = c.get_csv()
+c = docload()
+data = c.get_csv(path, encoding, source_column)
 
 class usingagent():
     def __init__(self):
