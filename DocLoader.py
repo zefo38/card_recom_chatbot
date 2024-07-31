@@ -8,11 +8,12 @@ from langchain_text_splitters import RecursiveJsonSplitter
 import json
 from dotenv import load_dotenv
 load_dotenv()
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-import magic
+from sentence_transformers import SentenceTransformer
 
-model_name = "intfloat/multilingual-e5-large-instruct"
+
+embedding_model_name = "intfloat/multilingual-e5-large"
 
 path = './consumer_data.csv'
 encoding = 'utf-8'
@@ -36,13 +37,13 @@ class docload():
         return d_data
 
     
-    def embedding(self, model_kwarg, encode_k, chunked_data):
-        hf_embedding = HuggingFaceEmbeddings(self.embedding_model_name, model_kwargs = model_kwarg, encode_kwargs = encode_k)
-        get_embed = hf_embedding.embed_documents(chunked_data)
+    def embedding(self, model_kwargs, encode_kwargs, chunked_data):
+        hf_embedding = HuggingFaceEmbeddings(model_name = self.embedding_model_name)
+        get_embed = hf_embedding.embed_documents(chunked_data, **model_kwargs, **encode_kwargs)
         return get_embed
 
 
-c = docload(path, d_path, model_name)
+c = docload(path, d_path, embedding_model_name)
 d = c.get_dir(glob = '**/*.tsv', loader_cls = TextLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-embed = c.embedding(model_kwarg = {"device" : "cpu"}, encode_k = {"normalize_embeddings" : True}, chunked_data = d)
+embed = c.embedding(model_kwargs = {"device" : "cpu"}, encode_kwargs = {"normalize_embeddings" : True}, chunked_data = d)
 print(embed)
