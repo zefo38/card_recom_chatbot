@@ -12,7 +12,6 @@ from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from sentence_transformers import SentenceTransformer
 
-
 embedding_model_name = "intfloat/multilingual-e5-large"
 
 path = './consumer_data.csv'
