@@ -26,23 +26,18 @@ class docload():
         self.path = path
         self.d_path = os.path.abspath(d_path)
         self.embedding_model_name = embedding_model_name
-
-    def get_csv(self, encoding, source_column):
-        loader = CSVLoader(self.path, encoding = encoding, source_column = source_column)
-        data = loader.load()
-        return data
     
     def get_dir(self, glob, loader_cls, silent_errors, loader_kwargs):
         loader = DirectoryLoader(self.d_path, glob = glob, loader_cls = loader_cls, silent_errors = silent_errors, loader_kwargs = loader_kwargs)
         d_data = loader.load_and_split()
         return d_data
     
-    def split_text(self, chunk_size, chunk_overlap, t_data):
-        spliter = RecursiveCharacterTextSplitter(chunk_size, chunk_overlap)
+    def split_text(self, t_data):
+        spliter = RecursiveCharacterTextSplitter()
         if isinstance(t_data, str) == False:
             text = []
             for data in t_data:
-                text.extend(spliter.split_text(data))
+                text.extend(spliter.split_text(data.page_content))
         else:
             text = spliter.split_text(t_data)
         return text
@@ -56,8 +51,8 @@ class docload():
 
 
 c = docload(path, d_path, embedding_model_name)
-d = c.get_dir(glob = '**/*.tsv', loader_cls = TextLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-print(d[0])
-t = c.split_text(300, 100, d)
+d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
+print(d)
+t = c.split_text(d)
 embed = c.embedding(chunked_data = t, model_kwargs = {'device':'cpu'}, encode_kwargs = {"normalize_embeddings" : True})
 print(embed)
