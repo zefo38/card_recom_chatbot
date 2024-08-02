@@ -13,6 +13,7 @@ from RAG_VectorDB import vectordb
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.documents.base import Document
 import numpy as np
+import pickle
 
 
 embedding_model_name = "intfloat/multilingual-e5-large"
@@ -21,8 +22,9 @@ path = './consumer_data.csv'
 encoding = 'utf-8'
 source_column = '고객번호'
 d_path = './source3'
-path = './card_chatbot'
+v_path = './card_chatbot'
 distance_strategy = DistanceStrategy.COSINE
+index_name = 'test1'
 
 embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwargs = {'device' : 'cpu'}, encode_kwargs = {"normalize_embeddings" : True})
 
@@ -38,6 +40,6 @@ print(type(t))
 
 vec = vectordb(embedding, d)
 db = vec.init_db(distance_strategy=distance_strategy)
-db = vec.db_save(path, index_name = 'test1')
-db2 = vec.db_load(path, index_name = 'test1')
+db = vec.db_save(v_path, db)
+db2 = vec.db_load(path = v_path)
 print(db2)

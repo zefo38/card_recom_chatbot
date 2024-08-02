@@ -34,7 +34,6 @@ class docload():
         return d_data
     
     def split_text(self, t_data, chunk_size, chunk_overlap):
-        print("AAAA", t_data)
         spliter = RecursiveCharacterTextSplitter(chunk_size = chunk_size, chunk_overlap = chunk_overlap)
         if isinstance(t_data, str) == False:
             text = spliter.split_documents(t_data)

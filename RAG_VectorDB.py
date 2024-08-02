@@ -13,11 +13,12 @@ class vectordb():
         db = FAISS.from_documents(self.input_data, self.embedding, distance_strategy = distance_strategy)
         return db
     
-    def db_save(self, index_name, path):
-        return FAISS.save_local(folder_path=path, index_name = index_name)
+    def db_save(self, path, vectorstore):
+        vectorstore = vectorstore
+        return vectorstore.save_local(path)
     
-    def db_load(self, path, index_name):
-        loaded_db = FAISS.load_local(path, self.embedding, index_name = index_name)
+    def db_load(self, path):
+        loaded_db = FAISS.load_local(path, self.embedding, allow_dangerous_deserialization=True)
         return loaded_db
     
     def ensemble_ret(self, rets, weights, c):
