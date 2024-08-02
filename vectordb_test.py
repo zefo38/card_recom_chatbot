@@ -28,14 +28,15 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 c = docload(d_path, embedding_model_name)
 d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-t = c.split_text(d)
-e = c.embedding(model_kwargs = {'device' : 'cpu'}, encode_kwargs = {'normalize_embeddings' : True}, chunked_data = t)
-print(d)
-print([np.array(embed).shape for embed in d])
+print("AAA", d[0])
+t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
+
 print(type(d))
+print(t[0])
+print(type(t))
 
 
-vec = vectordb(d, embedding)
+vec = vectordb(embedding, d)
 db = vec.init_db(distance_strategy=distance_strategy)
 db = vec.db_save(path, index_name = 'test1')
 db2 = vec.db_load(path, index_name = 'test1')

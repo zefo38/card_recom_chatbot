@@ -33,12 +33,11 @@ class docload():
         d_data = loader.load()
         return d_data
     
-    def split_text(self, t_data):
-        spliter = RecursiveCharacterTextSplitter()
+    def split_text(self, t_data, chunk_size, chunk_overlap):
+        print("AAAA", t_data)
+        spliter = RecursiveCharacterTextSplitter(chunk_size = chunk_size, chunk_overlap = chunk_overlap)
         if isinstance(t_data, str) == False:
-            text = []
-            for data in t_data:
-                text.extend(spliter.split_text(data.page_content))
+            text = spliter.split_documents(t_data)
         else:
             text = spliter.split_text(t_data)
         return text
