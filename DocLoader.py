@@ -9,10 +9,11 @@ import json
 from dotenv import load_dotenv
 load_dotenv()
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
 from sentence_transformers import SentenceTransformer
 from datasets import Dataset
 from multiprocess import Pool
+from langchain_core.documents.base import Document
+
 
 embedding_model_name = "intfloat/multilingual-e5-large"
 
@@ -22,14 +23,14 @@ source_column = '고객번호'
 d_path = './source2'
 
 class docload():
-    def __init__(self, path, d_path, embedding_model_name):
-        self.path = path
+    def __init__(self, d_path, embedding_model_name):
         self.d_path = os.path.abspath(d_path)
         self.embedding_model_name = embedding_model_name
+
     
     def get_dir(self, glob, loader_cls, silent_errors, loader_kwargs):
         loader = DirectoryLoader(self.d_path, glob = glob, loader_cls = loader_cls, silent_errors = silent_errors, loader_kwargs = loader_kwargs)
-        d_data = loader.load_and_split()
+        d_data = loader.load()
         return d_data
     
     def split_text(self, t_data):
@@ -49,10 +50,3 @@ class docload():
         return get_embed
 
 
-
-c = docload(path, d_path, embedding_model_name)
-d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-print(d)
-t = c.split_text(d)
-embed = c.embedding(chunked_data = t, model_kwargs = {'device':'cpu'}, encode_kwargs = {"normalize_embeddings" : True})
-print(embed)

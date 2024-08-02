@@ -4,22 +4,20 @@ from langchain.retrievers.ensemble import EnsembleRetriever
 
 
 class vectordb():
-    def __init__(self, embedding_model_name, model_kwargs, encode_kwargs, input_data):
-        self.embedding_model_name = embedding_model_name
-        self.model_kwargs = model_kwargs
-        self.encode_kwargs = encode_kwargs
+    def __init__(self, embedding, input_data):
+        self.embedding = embedding
         self.input_data = input_data
 
         
-    def init_db(self, embedding, distance_strategy):
-        db = FAISS.from_documents(self.input_data, embedding = embedding, distance_strategy = distance_strategy)
+    def init_db(self, distance_strategy):
+        db = FAISS.from_documents(self.input_data, self.embedding, distance_strategy = distance_strategy)
         return db
     
-    def db_save(self, db, path):
-        return db.save_local(folder_path=path)
+    def db_save(self, index_name, path):
+        return FAISS.save_local(folder_path=path, index_name = index_name)
     
-    def db_load(self, path, embedding):
-        loaded_db = FAISS.load_local(path, embedding)
+    def db_load(self, path, index_name):
+        loaded_db = FAISS.load_local(path, self.embedding, index_name = index_name)
         return loaded_db
     
     def ensemble_ret(self, rets, weights, c):
