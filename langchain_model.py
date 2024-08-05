@@ -28,17 +28,18 @@ c = docload()
 r = vectordb()
 
 class chat_chain():
-    def __init__(self, llm, memory):
+    def __init__(self, llm, memory, rec_model):
         self.llm = llm
         self.memory = memory
+        self.rec_model = rec_model
 
-    def get_chain_ordinary(self, llm, memory):
+    def get_chain_ordinary(self):
         text = '친구처럼 대화해줘'
         prompt = PromptTemplate.from_template(text)
         o_chain = prompt | self.llm | self.memory
         return o_chain
     
-    def get_chain_account(self, llm, memory):
+    def get_chain_account(self):
         prompt = ChatPromptTemplate.from_template([
             ("system", "소비내역을 참고해서 질문에 대답할 수 있습니다"),
             ("user", "{user_input}")
@@ -46,10 +47,16 @@ class chat_chain():
         ac_chain = prompt | self.llm | self.memory
         return ac_chain
     
-    def get_chain_recsys(self, llm, memory):
+    def get_chain_recsys(self):
         prompt = ChatPromptTemplate.from_template([
-            ("system", "소비내역과 카드 정보를 바탕으로 혜택이 큰 카드를 추천해줍니다"),
+            ("system", "소비내역과 카드 정보, 카드 추천 시스템을 바탕으로 혜택이 큰 카드를 추천해줍니다"),
             ("user", "{user_input}")
         ])
         rec_chain = prompt | self.llm | self.memory
         return rec_chain
+    
+    def chat_rec(self, input):
+        rec_chat = self.get_chain_recsys()
+        recommendation = self.rec_model(input)
+        out = rec_chat.invoke({"user" : input, "recommendations" : recommendation})
+        return out
