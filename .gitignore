@@ -11,3 +11,6 @@ labeled2/
 source3/
 card_chatbot/
 nlp/
+vectordb/
+source4/
+.dist/
