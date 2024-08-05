@@ -24,3 +24,7 @@ class vectordb():
     def ensemble_ret(self, rets, weights, c):
         ret = EnsembleRetriever(retrievers = rets, weights = weights, c = c)
         return ret
+    
+    def merge_db(self, db1, db2):
+        db1.merge_from(db2)
+        return db1
