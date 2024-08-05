@@ -39,7 +39,21 @@ class chat_chain():
         return o_chain
     
     def get_chain_account(self, data_path):
-        prompt = PromptTemplate.from_template('{data_path}에 있는 데이터를 조회해서 대답해줘. 모르면 모르겠다고 대답해')
+        prompt = PromptTemplate(
+        input_variables=["query"],
+        template=f"""
+        당신은 가계부 데이터를 포함한 파일({data_path})에 접근할 수 있는 보조 AI입니다.
+
+        이 데이터를 사용하여 다음 질문에 답변해 주세요:
+
+        {{query}}
+        모든 답변은 무조건 한글로 해줘.
+        금액 단위는 원이야
+        예시)
+        input : 카페에 총 얼마 썼는지 알려줘
+        AI : 카페에 총 n원을 썼습니다
+        """
+        )
         ac_chain = LLMChain(prompt = prompt, llm = self.llm, memory = self.memory)
         return ac_chain
     
