@@ -1,36 +1,55 @@
 import langchain
 import transformers
 from DocLoader import docload
-from langchain import LLMChain
+from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
-from langchain.llms import HuggingFacePipeline
+from langchain.prompts import ChatPromptTemplate
+from langchain_huggingface.llms import HuggingFacePipeline
 import langchain_core
 import langchain_text_splitters
-from langchain.agents import create_pandas_dataframe_agent
 from langchain_community.document_loaders.csv_loader import CSVLoader
+from langchain_community.document_loaders import DirectoryLoader, TextLoader, JSONLoader
 from langchain.agents import AgentType
+from langchain.memory import ConversationEntityMemory
+import faiss
+from langchain.docstore import InMemoryDocstore
+from langchain.vectorstores import FAISS
+from RAG_VectorDB import vectordb
+from DocLoader import docload
+from langchain.memory.prompt import ENTITY_MEMORY_CONVERSATION_TEMPLATE
 
 
-model_id = 'MLP-KTLim/llama-3-Korean-Bllossom-8B'
-path = './consumer_data.csv'
+llm = 'MLP-KTLim/llama-3-Korean-Bllossom-8B'
+path2 = './source2'
+path1 = './sorce'
 encoding = 'utf-8'
 source_column = '고객번호'
 c = docload()
-data = c.get_csv(path, encoding, source_column)
+r = vectordb()
 
-class usingagent():
-    def __init__(self):
-        self.temperature = 0.0
-        self.model = model_id
-        self.data = data
-        self.verbose = False
+class chat_chain():
+    def __init__(self, llm, memory):
+        self.llm = llm
+        self.memory = memory
 
-    def getagent(self, temperature, model, verbose, data):
-        agent = create_pandas_dataframe_agent(
-            HuggingFacePipeline(temperature = self.temperature, model = self.model),
-            data,
-            verbose = self.verbose,
-        )
-        return agent
-
-    def 
+    def get_chain_ordinary(self, llm, memory):
+        text = '친구처럼 대화해줘'
+        prompt = PromptTemplate.from_template(text)
+        o_chain = prompt | self.llm | self.memory
+        return o_chain
+    
+    def get_chain_account(self, llm, memory):
+        prompt = ChatPromptTemplate.from_template([
+            ("system", "소비내역을 참고해서 질문에 대답할 수 있습니다"),
+            ("user", "{user_input}")
+        ])
+        ac_chain = prompt | self.llm | self.memory
+        return ac_chain
+    
+    def get_chain_recsys(self, llm, memory):
+        prompt = ChatPromptTemplate.from_template([
+            ("system", "소비내역과 카드 정보를 바탕으로 혜택이 큰 카드를 추천해줍니다"),
+            ("user", "{user_input}")
+        ])
+        rec_chain = prompt | self.llm | self.memory
+        return rec_chain
