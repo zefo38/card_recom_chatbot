@@ -43,6 +43,7 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 c = docload(d_path, embedding_model_name)
 d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
+data = c.get_dir(glob = '**/*.csv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
 t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
 
 
