@@ -14,3 +14,4 @@ nlp/
 vectordb/
 source4/
 .dist/
+test_db/

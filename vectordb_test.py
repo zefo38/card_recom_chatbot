@@ -30,12 +30,8 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 c = docload(d_path, embedding_model_name)
 d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-print("AAA", d[0])
 t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
 
-print(type(d))
-print(t[0])
-print(type(t))
 
 
 vec = vectordb(embedding, d)
