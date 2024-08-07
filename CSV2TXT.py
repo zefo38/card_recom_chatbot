@@ -6,10 +6,11 @@ class csv2txt():
     def transform(self):
         df = self.data
         transactions = []
-        for _, row in df.iterrows():
-            date = df['날짜']
-            customer_id = df['고객번호']
-            for category, amount in row[2:].items():
+        for index, row in df.iterrows():
+            date = row['날짜']
+            customer_id = row['고객번호']
+            for category in df.columns[2:]:
+                amount = row[category]
                 if amount >= 0:
                     transaction_txt = f"고객번호 {customer_id}번 고객님은 {date}에 {category}에서 {amount}원을 썼습니다"
                     transactions.append(transaction_txt)
@@ -19,5 +20,5 @@ class csv2txt():
         
         with open(self.save_path, 'w', encoding = 'utf-8') as file:
             for transaction in transactions:
-                file.write(transactions + '\n')
+                file.write(transaction + '\n')
         return file
