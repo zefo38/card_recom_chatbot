@@ -36,31 +36,26 @@ class chat_chain():
         o_chain = prompt | self.llm | StrOutputParser()
         return o_chain
     
-    def get_chain_account(self, data):
+    def get_chain_account(self):
         prompt = PromptTemplate(
         input_variables=["chat_history", "query"],
 
             template=f"""
-            당신은 가계부 데이터를 포함한 파일({data})에 접근할 수 있는 보조 AI입니다.
-            이 데이터의 열은 날짜,고객번호,카페,음식점,여행,서점,쇼핑,온라인결제,교통,미용실,병원,주유소,화장품,편의점,주차장,문화,이동통신,학원,스포츠,부동산,자동차,기기,기타,동물병원,세탁소,영화,정육점,해외직구,택시,사우나,보험,항공사,숙박
-            입니다.
-            행은 이 열에 맞는 값들입니다.
-            날짜열에 해당하는 값은 날짜이고, 고객번호열에 해당하는 값은 고객번호 입니다. 그 외에는 다 소비금액입니다.
-            즉 이 데이터는 날짜, 고객, 그 고객의 소비에 관한 데이터 입니다.
+            당신은 가계부, 카드 추천 기능도 하는 챗봇입니다
+            이 데이터는 날짜, 고객, 그 고객의 소비에 관한 데이터 입니다.
             당신은 무조건 한글로만 답해야 합니다
             금액의 단위는 원입니다
             질문자의 고객번호는 1번 입니다.
             데이터를 제대로 보고 알려주세요. 이모티콘은 없어도 되지만 정확도는 높아야 합니다
 
-            이 데이터를 조회하여 다음 질문에 답변해 주세요:
-            ({data})
+            
             {{chat_history}}
             Human : {{query}}
             AI:
             """
         )
 
-        ac_chain = LLMChain( prompt = prompt, llm = self.llm, memory = self.memory)
+        ac_chain = LLMChain( prompt = prompt, llm = self.llm, memory = self.memory, retriever = self.retriever)
         return ac_chain
     
     def get_chain_recsys(self):
