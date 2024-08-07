@@ -17,8 +17,10 @@ class recsys():
           return pac_data
     
     def clustering(self, n_cluster, pre_data):
+          c_data = self.data.copy()
           km = KMeans(n_clusters = n_cluster)
           clusters = km.fit_transform(pre_data)
-          return clusters
+          c_data['cluster'] = km.fit_transform(pre_data)
+          return clusters, c_data
     
     def get_sum_score(self, )

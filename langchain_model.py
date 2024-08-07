@@ -2,6 +2,8 @@ import langchain
 import transformers
 from DocLoader import docload
 from langchain.chains.llm import LLMChain
+from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
+from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_huggingface.llms import HuggingFacePipeline
@@ -54,9 +56,22 @@ class chat_chain():
             AI:
             """
         )
+        question_prompt = PromptTemplate(
+            input_variables=["chat_history", "query"],
+            template = f"""
+            질문자의 고객번호는 1번입니다
+            대화를 바탕으로 다음 질문을 생성하세요
+            무조건 한글로만 해야 합니다
+            대화 : {{chat_history}}
+            질문 : {{query}}
+            """
+        )
 
-        ac_chain = LLMChain( prompt = prompt, llm = self.llm, memory = self.memory, retriever = self.retriever)
-        return ac_chain
+        ac_chain = LLMChain(prompt = prompt, llm = self.llm, memory = self.memory)
+        qa_chain = load_qa_chain(llm = self.llm, chain_type = 'stuff')
+        question_gen_chain = LLMChain(prompt = question_prompt, llm = self.llm)
+        conv_chain = ConversationalRetrievalChain(retriever = self.retriever, combine_docs_chain = qa_chain, question_generator = question_gen_chain , memory = self.memory)
+        return conv_chain
     
     def get_chain_recsys(self):
         prompt = ChatPromptTemplate.from_template([
@@ -72,6 +87,11 @@ class chat_chain():
         out = rec_chat.invoke({"user" : input, "recommendations" : recommendation})
         return out
     
-    def save_memory(self, input, output):
-        context = self.memory.save_context({"input" : input},{"output" : output})
+    def save_memory(self, input_text, output_text):
+        if not isinstance(input_text, str):
+            raise ValueError("input_text must be a string")
+        if not isinstance(output_text, str):
+            raise ValueError("output_text must be a string")
+
+        context = self.memory.save_context({"input": input_text}, {"output": output_text})
         return context

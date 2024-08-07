@@ -43,18 +43,18 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 
 
-c = docload(d_path, embedding_model_name)
+#c = docload(d_path, embedding_model_name)
 c1 = docload(d1_path, embedding_model_name)
-d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
+#d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
 data = c1.get_dir(glob = '**/*.csv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
+#t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
 print(data)
 
 
 
 vec2 = vectordb(embedding, data)
-db3 = vec2.init_db(distance_strategy = distance_strategy)
-db3 = vec2.db_save(v2_path, db3)
+#db3 = vec2.init_db(distance_strategy = distance_strategy)
+#db3 = vec2.db_save(v2_path, db3)
 db4 = vec2.db_load(path = v2_path)
 
 basic_ret = vec2.db_ret(db4, 2)
@@ -65,12 +65,11 @@ ensemble = vec2.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 2)
 chain = chat_chain(llm, memory, ensemble)
 
 account_chain = chain.get_chain_account()
-result = account_chain.predict(query = "내가 카페에 총 얼마 썼는지 알려줘")
+result = account_chain.invoke({"chat_history" : "", "question" : "내가 카페에 얼마를 썼는지 알려줘"})
 print(result)
-context = chain.save_memory("내가 카페에 총 얼마 썼는지 알려줘", result)
-result2 = account_chain.predict(query = "그럼 서점엔 얼마나 썼는지 알려줘")
+chat_chain.save_memory("내가 카페에 얼마를 썼는지 알려줘", result["AIMessage"])
+result2 = account_chain.invoke({"chat_history" : "Human: 내가 카페에 얼마를 썼는지 알려줘\nAI : " + result["AIMessage"] + "\n", "question" : "그럼 서점엔 얼마를 썼는지 알려줘"})
 print(result2)
-context = chain.save_memory("그럼 서점엔 얼마나 썼는지 알려줘", result2)
-result3 = account_chain.predict(query = "그 둘의 총합을 알려줘")
-context = chain.save_memory("그 둘의 총합을 알려줘", result3)
+chat_chain.save_memory("그럼 서점엔 얼마를 썼는지 알려줘", result2["AIMessage"])
+result3 = account_chain.invoke({"chat_history" : "Human: 그럼 서점엔 얼마를 썼는지 알려줘\nAI : " + result2["AIMessage"] + "\n", "question" : "그둘을 합쳐줘"})
 print(result3)
