@@ -23,4 +23,4 @@ class recsys():
           c_data['cluster'] = km.fit_transform(pre_data)
           return clusters, c_data
     
-    def get_sum_score(self, )
+    def get_sum_score(self, cluster_data, )
