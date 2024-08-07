@@ -15,3 +15,5 @@ vectordb/
 source4/
 .dist/
 test_db/
+consume_data/
+test_db2/
