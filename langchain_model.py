@@ -23,6 +23,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from operator import itemgetter
+from langchain_core.runnables import RunnablePassthrough
 
 
 
@@ -38,9 +39,12 @@ class chat_chain():
         o_chain = prompt | self.llm | StrOutputParser()
         return o_chain
     
+    def format_docs(self, docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
     def get_chain_account(self):
         prompt = PromptTemplate(
-        input_variables=["chat_history", "query"],
+        input_variables=["chat_history", "query", "context"],
 
             template=f"""
             당신은 가계부, 카드 추천 기능도 하는 챗봇입니다
@@ -48,30 +52,18 @@ class chat_chain():
             당신은 무조건 한글로만 답해야 합니다
             금액의 단위는 원입니다
             질문자의 고객번호는 1번 입니다.
+            이전 대화 내용이 있으면 이전 대화 내용도 참고하세요.
             데이터를 제대로 보고 알려주세요. 이모티콘은 없어도 되지만 정확도는 높아야 합니다
 
             
-            {{chat_history}}
+            이전 대화 내용 : {{chat_history}}
             Human : {{query}}
+            Context : {{context}}
             AI:
             """
         )
-        question_prompt = PromptTemplate(
-            input_variables=["chat_history", "query"],
-            template = f"""
-            질문자의 고객번호는 1번입니다
-            대화를 바탕으로 다음 질문을 생성하세요
-            무조건 한글로만 생성해야 합니다
-            대화 : {{chat_history}}
-            질문 : {{query}}
-            """
-        )
-
-        ac_chain = LLMChain(prompt = prompt, llm = self.llm, memory = self.memory)
-        qa_chain = load_qa_chain(llm = self.llm, chain_type = 'stuff')
-        question_gen_chain = LLMChain(prompt = question_prompt, llm = self.llm)
-        conv_chain = ConversationalRetrievalChain(retriever = self.retriever, combine_docs_chain = qa_chain, question_generator = question_gen_chain , memory = self.memory)
-        return conv_chain
+        rag_chain = ({"context" : self.retriever, "query" : RunnablePassthrough()} | prompt | self.llm | self.memory | StrOutputParser())
+        return rag_chain
     
     def get_chain_recsys(self):
         prompt = ChatPromptTemplate.from_template([

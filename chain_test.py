@@ -33,9 +33,9 @@ memory = ConversationBufferMemory(memory_key = 'chat_history', return_messages =
 store = {}
 session_ids = 'test1'
 embedding_model_name = "intfloat/multilingual-e5-large"
-d_path = './source4'
+d_path = './customer_txt_file'
 d1_path = './consume_data'
-v_path = './test_db'
+v_path = './faiss_db'
 v2_path = './test_db2'
 distance_strategy = DistanceStrategy.COSINE
 
@@ -43,33 +43,31 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 
 
-#c = docload(d_path, embedding_model_name)
-c1 = docload(d1_path, embedding_model_name)
-#d = c.get_dir(glob = '**/*.tsv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-data = c1.get_dir(glob = '**/*.csv', loader_cls = CSVLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
-#t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
-print(data)
+c = docload(d_path, embedding_model_name)
+d = c.get_dir(glob = '**/*.txt', loader_cls = TextLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
+t = c.split_text(d, chunk_size = 200, chunk_overlap = 50)
+print(t)
 
 
 
-vec2 = vectordb(embedding, data)
-#db3 = vec2.init_db(distance_strategy = distance_strategy)
-#db3 = vec2.db_save(v2_path, db3)
-db4 = vec2.db_load(path = v2_path)
+vec = vectordb(embedding, t)
+#db = vec.init_db(distance_strategy = distance_strategy)
+#db = vec.db_save(v_path, db)
+db2 = vec.db_load(path = v_path)
 
-basic_ret = vec2.db_ret(db4, 2)
-bm25 = vec2.bm_ret(data, 2)
-ensemble = vec2.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 2)
+basic_ret = vec.db_ret(db2, 5)
+bm25 = vec.bm_ret(d, 5)
+ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 5)
 
 
 chain = chat_chain(llm, memory, ensemble)
 
 account_chain = chain.get_chain_account()
-result = account_chain.invoke({"chat_history" : "", "question" : "내가 카페에 얼마를 썼는지 알려줘"})
+result = account_chain.invoke({"chat_history" : "", "question" : "내 고객번호는 1번이야. 내가 이때까지 카페에 총 얼마를 썼는지 알려줘"})
 print(result)
-chat_chain.save_memory("내가 카페에 얼마를 썼는지 알려줘", output_text = result["answer"])
-result2 = account_chain.invoke({"chat_history" : "Human: 내가 카페에 얼마를 썼는지 알려줘\nAI : " + result["answer"] + "\n", "question" : "그럼 서점엔 얼마를 썼는지 알려줘"})
+chain.save_memory("내가 카페에 얼마를 썼는지 알려줘", output_text = result["answer"])
+result2 = account_chain.invoke({"chat_history" : "Human: 내가 카페에 얼마를 썼는지 알려줘\nAI : " + result["answer"] + "\n", "query" : "그럼 서점엔 얼마를 썼는지 알려줘"})
 print(result2)
-chat_chain.save_memory("그럼 서점엔 얼마를 썼는지 알려줘", output_text = result2["answer"])
+chain.save_memory("그럼 서점엔 얼마를 썼는지 알려줘", output_text = result2["answer"])
 result3 = account_chain.invoke({"chat_history" : "Human: 그럼 서점엔 얼마를 썼는지 알려줘\nAI : " + result2["answer"] + "\n", "question" : "그둘을 합쳐줘"})
 print(result3)
