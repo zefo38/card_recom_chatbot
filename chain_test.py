@@ -41,7 +41,7 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 prompt = PromptTemplate.from_template(
     """
-        당신은 가계부 역할과 카드 추천 역할도 하는 챗봇입니다.
+        당신은 가계부 역할과 카드 추천 역할을 동시에 하는 챗봇입니다.
         다음의 retrieved context를 이용하여 질문에 답하세요.
         챗봇 사용자의 고객번호는 무조건 1번입니다.
         고객번호 1번 외의 다른 고객번호는 조회하면 안됩니다.
