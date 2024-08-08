@@ -24,6 +24,6 @@ class recsys():
           return clusters, c_data
     
     def get_sum_score(self, cluster_data, card_data):
-          df = self.cluster_data
-          card_df = self.card_data
-          
+          cluster_mean = cluster_data.groupby(['cluster']).mean()
+          card_data
+

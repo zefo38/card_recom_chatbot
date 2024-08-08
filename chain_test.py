@@ -30,25 +30,26 @@ llm = OllamaLLM(model = 'llama3:8b', temperature = 0.0)
 data = './processed_file(1) (9).csv'
 
 distance_strategy = DistanceStrategy.COSINE
-memory = ConversationBufferMemory(memory_key = 'chat_history', return_messages = True)
 store = {}
 session_ids = 'test1'
 embedding_model_name = "intfloat/multilingual-e5-large"
 d_path = './customer_txt_file'
-d1_path = './consume_data'
 v_path = './faiss_db'
-v2_path = './test_db2'
 distance_strategy = DistanceStrategy.COSINE
 
 embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwargs = {'device' : 'cpu'}, encode_kwargs = {"normalize_embeddings" : True})
 
 prompt = PromptTemplate.from_template(
     """
-        당신은 가계부 역할과 카드 추천 역할도 하는 챗봇입니다
-        나의 고객번호는 무조건 1번입니다
-        그 외의 다른 고객번호는 조회하면 안됩니다
-        다음의 retrieved context를 이용하여 질문에 답하세요
-        답은 무조건 한글로 해야 합니다
+        당신은 가계부 역할과 카드 추천 역할도 하는 챗봇입니다.
+        다음의 retrieved context를 이용하여 질문에 답하세요.
+        챗봇 사용자의 고객번호는 무조건 1번입니다.
+        고객번호 1번 외의 다른 고객번호는 조회하면 안됩니다.
+        날짜를 특정하지 않고 카테고리만 특정한다면 물어본 카테고리에 쓴 금액 총합을 알려주셔야 합니다.
+        카테고리를 특정하지 않고 날짜만 특정한다면 그 날짜에 쓴 금액 총합을 알려주셔야 합니다.
+        비교나 연산을 해주길 원한다면 질문과 위의 조건들을 따라 계산해서 알려주셔야 합니다.
+        답은 무조건 한글로 해야 합니다.
+        You must Answer in Korean.
 
         #Previous Chat History : {chat_history}
         #Question : {question}
@@ -69,9 +70,9 @@ vec = vectordb(embedding, t)
 #db = vec.db_save(v_path, db)
 db2 = vec.db_load(path = v_path)
 
-basic_ret = vec.db_ret(db2, 5)
-bm25 = vec.bm_ret(t, 5)
-ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 5)
+basic_ret = vec.db_ret(db2, 10)
+bm25 = vec.bm_ret(t, 10)
+ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 10)
 
 
 chain = rag_chain(llm, prompt, ensemble, session_ids, store)
@@ -81,5 +82,5 @@ result = account_chain.invoke({"question":"내가 카페에 쓴 금액이 총 �
 print(result)
 result2 = account_chain.invoke({"question":"그럼 내가 서점에 쓴 금액을 알려줘"}, config = {"configurable" : {"session_id" : session_ids}})
 print(result2)
-result3 = account_chain.invoke({"question":"이전 대답을 영어로 바꿔줘"}, config = {"configurable" : {"session_id" : session_ids}})
+result3 = account_chain.invoke({"question":"그러면 내가 서점에 많이썼어? 아니면 카페에 많이썼어?"}, config = {"configurable" : {"session_id" : session_ids}})
 print(result3)

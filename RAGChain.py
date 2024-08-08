@@ -18,7 +18,7 @@ class rag_chain():
         self.session_ids = session_ids
         self.store = store
         self.chain = ({"context" : itemgetter("question") | self.retriever, "question" : itemgetter("question"), "chat_history" : itemgetter("chat_history"),} | self.prompt | self.llm | StrOutputParser())
-
+    
     def get_session_history(self):
         print(f"[대화 세션 ID] : {self.session_ids}")
         if self.session_ids not in self.store:
