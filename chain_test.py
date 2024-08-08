@@ -56,18 +56,16 @@ vec = vectordb(embedding, t)
 db2 = vec.db_load(path = v_path)
 
 basic_ret = vec.db_ret(db2, 5)
-bm25 = vec.bm_ret(d, 5)
+bm25 = vec.bm_ret(t, 5)
 ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 5)
 
 
 chain = chat_chain(llm, memory, ensemble)
 
 account_chain = chain.get_chain_account()
-result = account_chain.invoke({"chat_history" : "", "question" : "내 고객번호는 1번이야. 내가 이때까지 카페에 총 얼마를 썼는지 알려줘"})
+result = account_chain.invoke("내가 카페에 쓴 금액이 총 얼마인지 알려줘")
 print(result)
-chain.save_memory("내가 카페에 얼마를 썼는지 알려줘", output_text = result["answer"])
-result2 = account_chain.invoke({"chat_history" : "Human: 내가 카페에 얼마를 썼는지 알려줘\nAI : " + result["answer"] + "\n", "query" : "그럼 서점엔 얼마를 썼는지 알려줘"})
+result2 = account_chain.invoke("그럼 서점엔 얼마를 썼는지 알려줘")
 print(result2)
-chain.save_memory("그럼 서점엔 얼마를 썼는지 알려줘", output_text = result2["answer"])
-result3 = account_chain.invoke({"chat_history" : "Human: 그럼 서점엔 얼마를 썼는지 알려줘\nAI : " + result2["answer"] + "\n", "question" : "그둘을 합쳐줘"})
+result3 = account_chain.invoke("그둘을 합쳐줘")
 print(result3)

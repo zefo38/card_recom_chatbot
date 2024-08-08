@@ -4,6 +4,7 @@ from DocLoader import docload
 from langchain.chains.llm import LLMChain
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
 from langchain.chains.question_answering import load_qa_chain
+from langchain.chains.conversation.base import ConversationChain
 from langchain.prompts import PromptTemplate
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_huggingface.llms import HuggingFacePipeline
@@ -33,57 +34,23 @@ class chat_chain():
         self.llm = llm
         self.memory = memory
         self.retriever = retriever
-
-    def get_chain_ordinary(self, prom):
-        prompt = ENTITY_MEMORY_CONVERSATION_TEMPLATE + prom
-        o_chain = prompt | self.llm | StrOutputParser()
-        return o_chain
     
-    def format_docs(self, docs):
-        return "\n\n".join(doc.page_content for doc in docs)
+
     
     def get_chain_account(self):
-        prompt = PromptTemplate(
-        input_variables=["chat_history", "query", "context"],
+        prompt = ChatPromptTemplate.from_messages(
+        [("system","""
+            당신은 가계부 역할과 카드 추천 역할을 하는 챗봇입니다.
+            나의 고객번호는 1번 입니다.
+            고객번호 1번 이외의 데이터는 조회하면 안됩니다.
+            당신은 무조건 한글로만 답해야 합니다.
+            금액의 단위는 원입니다.
 
-            template=f"""
-            당신은 가계부, 카드 추천 기능도 하는 챗봇입니다
-            이 데이터는 날짜, 고객, 그 고객의 소비에 관한 데이터 입니다.
-            당신은 무조건 한글로만 답해야 합니다
-            금액의 단위는 원입니다
-            질문자의 고객번호는 1번 입니다.
-            이전 대화 내용이 있으면 이전 대화 내용도 참고하세요.
-            데이터를 제대로 보고 알려주세요. 이모티콘은 없어도 되지만 정확도는 높아야 합니다
+            context를 사용하여 다음 질문에 답변해 주세요:
+            {context}
+            """,
+        ),
+        ("human", "{question}")])
+        rag_chain = ConversationChain({"context" : self.retriever, "question" : RunnablePassthrough(),} | prompt | self.llm)
 
-            
-            이전 대화 내용 : {{chat_history}}
-            Human : {{query}}
-            Context : {{context}}
-            AI:
-            """
-        )
-        rag_chain = ({"context" : self.retriever, "query" : RunnablePassthrough()} | prompt | self.llm | self.memory | StrOutputParser())
         return rag_chain
-    
-    def get_chain_recsys(self):
-        prompt = ChatPromptTemplate.from_template([
-            ("system", "소비내역과 카드 정보, 카드 추천 시스템을 바탕으로 혜택이 큰 카드를 추천해줍니다"),
-            ("user", "{user_input}")
-        ])
-        rec_chain = prompt | self.llm | StrOutputParser()
-        return rec_chain
-    
-    def chat_rec(self, input):
-        rec_chat = self.get_chain_recsys()
-        recommendation = self.rec_model(input)
-        out = rec_chat.invoke({"user" : input, "recommendations" : recommendation})
-        return out
-    
-    def save_memory(self, input_text, output_text):
-        if not isinstance(input_text, str):
-            raise ValueError("input_text must be a string")
-        if not isinstance(output_text, str):
-            raise ValueError("output_text must be a string")
-
-        context = self.memory.save_context({"input": input_text}, {"output": output_text})
-        return context
