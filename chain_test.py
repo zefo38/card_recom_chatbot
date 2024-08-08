@@ -23,6 +23,7 @@ from transformers import AutoModel
 from langchain_core.output_parsers import StrOutputParser
 from operator import itemgetter
 import pandas as pd
+from RAGChain import rag_chain
 
 llm = OllamaLLM(model = 'llama3:8b', temperature = 0.0)
 
@@ -41,7 +42,20 @@ distance_strategy = DistanceStrategy.COSINE
 
 embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwargs = {'device' : 'cpu'}, encode_kwargs = {"normalize_embeddings" : True})
 
+prompt = PromptTemplate.from_template(
+    """
+        당신은 가계부 역할과 카드 추천 역할도 하는 챗봇입니다
+        나의 고객번호는 무조건 1번입니다
+        그 외의 다른 고객번호는 조회하면 안됩니다
+        다음의 retrieved context를 이용하여 질문에 답하세요
+        답은 무조건 한글로 해야 합니다
 
+        #Previous Chat History : {chat_history}
+        #Question : {question}
+        #Context : {context}
+        #Answer : 
+    """
+)
 
 c = docload(d_path, embedding_model_name)
 d = c.get_dir(glob = '**/*.txt', loader_cls = TextLoader, silent_errors = False, loader_kwargs = {'autodetect_encoding':True})
@@ -60,12 +74,12 @@ bm25 = vec.bm_ret(t, 5)
 ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 5)
 
 
-chain = chat_chain(llm, memory, ensemble)
+chain = rag_chain(llm, prompt, ensemble, session_ids, store)
 
-account_chain = chain.get_chain_account()
-result = account_chain.invoke("내가 카페에 쓴 금액이 총 얼마인지 알려줘")
+account_chain = chain.get_rag_history()
+result = account_chain.invoke({"question":"내가 카페에 쓴 금액이 총 얼마인지 알려줘"}, config = {"configurable" : {"session_id" : session_ids}})
 print(result)
-result2 = account_chain.invoke("그럼 서점엔 얼마를 썼는지 알려줘")
+result2 = account_chain.invoke({"question":"그럼 내가 서점에 쓴 금액을 알려줘"}, config = {"configurable" : {"session_id" : session_ids}})
 print(result2)
-result3 = account_chain.invoke("그둘을 합쳐줘")
+result3 = account_chain.invoke({"question":"이전 대답을 영어로 바꿔줘"}, config = {"configurable" : {"session_id" : session_ids}})
 print(result3)
