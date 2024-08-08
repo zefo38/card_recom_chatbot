@@ -32,7 +32,7 @@ data = './processed_file(1) (9).csv'
 distance_strategy = DistanceStrategy.COSINE
 store = {}
 session_ids = 'test1'
-embedding_model_name = "intfloat/multilingual-e5-large"
+embedding_model_name = 'jhgan/ko-sroberta-nli'
 d_path = './customer_txt_file'
 v_path = './faiss_db'
 distance_strategy = DistanceStrategy.COSINE
@@ -43,13 +43,16 @@ prompt = PromptTemplate.from_template(
     """
         당신은 가계부 역할과 카드 추천 역할을 동시에 하는 챗봇입니다.
         다음의 retrieved context를 이용하여 질문에 답하세요.
-        챗봇 사용자의 고객번호는 무조건 1번입니다.
-        고객번호 1번 외의 다른 고객번호는 조회하면 안됩니다.
-        날짜를 특정하지 않고 카테고리만 특정한다면 물어본 카테고리에 쓴 금액 총합을 알려주셔야 합니다.
-        카테고리를 특정하지 않고 날짜만 특정한다면 그 날짜에 쓴 금액 총합을 알려주셔야 합니다.
-        비교나 연산을 해주길 원한다면 질문과 위의 조건들을 따라 계산해서 알려주셔야 합니다.
-        답은 무조건 한글로 해야 합니다.
-        You must Answer in Korean.
+
+        - 챗봇 사용자의 고객번호는 무조건 1번입니다.
+        - 고객번호 1번 외의 다른 고객번호는 무시하세요.
+        - 질문에 특정 카테고리가 언급되었을 경우, 해당 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
+            - 예: "고객번호 1번이 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 카페에서 쓴 총 금액을 답변하세요.
+        - 질문에 특정 날짜가 언급되었을 경우, 해당 날짜에 고객번호 1번이 쓴 금액 총합을 알려주세요.
+            -  예: "고객번호 1번이 2023년 5월 1일에 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 쓴 총 금액을 답변하세요.
+        - 질문에 카테고리와 날짜가 동시에 언급되었을 경우, 해당 날짜에 해당 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
+            - 예: "고객번호 1번이 2023년 5월 1일에 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 카페에서 쓴 총 금액을 답변하세요.
+        - 답은 무조건 한글로 해야 합니다.
 
         #Previous Chat History : {chat_history}
         #Question : {question}
@@ -66,8 +69,8 @@ print(t)
 
 
 vec = vectordb(embedding, t)
-#db = vec.init_db(distance_strategy = distance_strategy)
-#db = vec.db_save(v_path, db)
+db = vec.init_db(distance_strategy = distance_strategy)
+db = vec.db_save(v_path, db)
 db2 = vec.db_load(path = v_path)
 
 basic_ret = vec.db_ret(db2, 10)
