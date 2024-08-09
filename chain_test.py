@@ -48,12 +48,13 @@ prompt = PromptTemplate.from_template(
         - 질문에 특정 카테고리만 언급되었을 경우, 해당 카테고리에서 모든 날짜에 고객번호 1번이 쓴 금액 총합을 알려주세요.
             - 예: "내가 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 모든 날짜에 카페에서 쓴 총 금액을 답변하세요.
         - 질문에 특정 날짜만 언급되었을 경우, 해당 날짜에 모든 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
-            -  예: "내가 2023년 5월 1일에 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 모든 카테고리에서 쓴 총 금액을 답변하세요.
+            -  예: "내가 2023년 5월 1일에 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 2023년 5월 1일에 모든 카테고리에서 쓴 총 금액을 답변하세요.
         - 질문에 카테고리와 날짜가 동시에 언급되었을 경우, 해당 날짜에 해당 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
-            - 예: "내가 2023년 5월 1일에 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 카페에서 쓴 총 금액을 답변하세요.
+            - 예: "내가 2023년 5월 1일에 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 2023년 5월 1일에 카페에서 쓴 총 금액을 답변하세요.
         - 답은 무조건 한글로 해야 합니다.
 
         다음의 retrieved context를 이용하여 질문에 답하세요.
+        무조건 한글로만 답해야 합니다
 
 
         #Previous Chat History : {chat_history}
@@ -75,9 +76,9 @@ vec = vectordb(embedding, t)
 #db = vec.db_save(v_path, db)
 db2 = vec.db_load(path = v_path)
 
-basic_ret = vec.db_ret(db2, 4)
-bm25 = vec.bm_ret(t, 4)
-ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 4)
+basic_ret = vec.db_ret(db2, 6)
+bm25 = vec.bm_ret(t, 6)
+ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 6)
 
 
 chain = rag_chain(llm, prompt, ensemble, session_ids, store)
