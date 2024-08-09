@@ -1,4 +1,8 @@
 # card_chatbot
+![langchain](https://github.com/user-attachments/assets/196777a2-540d-4b20-9086-da5b21c808e4)
+
+![jumpstart-fm-rag](https://github.com/user-attachments/assets/4a8d5e08-9f15-4b49-8ad0-cc6eb3ddb704)
+
 
 ## 랭체인을 활용한 가계부 챗봇 및 카드 추천 시스템
 
@@ -35,3 +39,4 @@
     - 그러기 위해서 대화 내용을 store에 저장 후 프롬프트를 통해 활용하게 함
     - prompt를 통해 고객번호 1번의 데이터만 사용하게 제약
       - prompt를 매개변수로 쓰게 하여 사용자들마다 개인화된 챗봇 구현을 가능하게 함
+      - 수정을 해야 한다면 고객번호 부분만 바꿔주면 됨

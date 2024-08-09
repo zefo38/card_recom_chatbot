@@ -74,8 +74,8 @@ print(t)
 
 
 vec = vectordb(embedding, t)
-db = vec.init_db(distance_strategy = distance_strategy)
-db = vec.db_save(v_path, db)
+#db = vec.init_db(distance_strategy = distance_strategy)
+#db = vec.db_save(v_path, db)
 db2 = vec.db_load(path = v_path)
 
 basic_ret = vec.db_ret(db2, 5)
