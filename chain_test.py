@@ -32,7 +32,7 @@ data = './processed_file(1) (9).csv'
 distance_strategy = DistanceStrategy.COSINE
 store = {}
 session_ids = 'test1'
-embedding_model_name = 'jhgan/ko-sroberta-nli'
+embedding_model_name = 'intfloat/multilingual-e5-large'
 d_path = './customer_txt_file'
 v_path = './faiss_db'
 distance_strategy = DistanceStrategy.COSINE
@@ -41,18 +41,20 @@ embedding = HuggingFaceEmbeddings(model_name = embedding_model_name, model_kwarg
 
 prompt = PromptTemplate.from_template(
     """
-        당신은 가계부 역할과 카드 추천 역할을 동시에 하는 챗봇입니다.
-        다음의 retrieved context를 이용하여 질문에 답하세요.
+        당신은 가계부 역할을 하는 챗봇입니다.
 
         - 챗봇 사용자의 고객번호는 무조건 1번입니다.
         - 고객번호 1번 외의 다른 고객번호는 무시하세요.
-        - 질문에 특정 카테고리가 언급되었을 경우, 해당 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
-            - 예: "고객번호 1번이 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 카페에서 쓴 총 금액을 답변하세요.
-        - 질문에 특정 날짜가 언급되었을 경우, 해당 날짜에 고객번호 1번이 쓴 금액 총합을 알려주세요.
-            -  예: "고객번호 1번이 2023년 5월 1일에 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 쓴 총 금액을 답변하세요.
+        - 질문에 특정 카테고리만 언급되었을 경우, 해당 카테고리에서 모든 날짜에 고객번호 1번이 쓴 금액 총합을 알려주세요.
+            - 예: "내가 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 모든 날짜에 카페에서 쓴 총 금액을 답변하세요.
+        - 질문에 특정 날짜만 언급되었을 경우, 해당 날짜에 모든 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
+            -  예: "내가 2023년 5월 1일에 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 모든 카테고리에서 쓴 총 금액을 답변하세요.
         - 질문에 카테고리와 날짜가 동시에 언급되었을 경우, 해당 날짜에 해당 카테고리에서 고객번호 1번이 쓴 금액 총합을 알려주세요.
-            - 예: "고객번호 1번이 2023년 5월 1일에 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 카페에서 쓴 총 금액을 답변하세요.
+            - 예: "내가 2023년 5월 1일에 카페에서 쓴 금액은 얼마인가요?"라고 물어보면, 고객번호 1번이 그 날짜에 카페에서 쓴 총 금액을 답변하세요.
         - 답은 무조건 한글로 해야 합니다.
+
+        다음의 retrieved context를 이용하여 질문에 답하세요.
+
 
         #Previous Chat History : {chat_history}
         #Question : {question}
@@ -69,13 +71,13 @@ print(t)
 
 
 vec = vectordb(embedding, t)
-db = vec.init_db(distance_strategy = distance_strategy)
-db = vec.db_save(v_path, db)
+#db = vec.init_db(distance_strategy = distance_strategy)
+#db = vec.db_save(v_path, db)
 db2 = vec.db_load(path = v_path)
 
-basic_ret = vec.db_ret(db2, 10)
-bm25 = vec.bm_ret(t, 10)
-ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 10)
+basic_ret = vec.db_ret(db2, 4)
+bm25 = vec.bm_ret(t, 4)
+ensemble = vec.ensemble_ret([basic_ret, bm25], [0.5, 0.5], 4)
 
 
 chain = rag_chain(llm, prompt, ensemble, session_ids, store)

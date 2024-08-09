@@ -25,3 +25,12 @@
     - csv2txt 클래스를 만들어서 사용
   - 텍스트 데이터로 변환 후 벡터화 -> 벡터DB에 저장
 
+- RAG
+  - retriever의 경우 ensemble 방식을 사용
+    - 최대한 자원을 덜 소비하면서 검색 성능을 높이기 위함
+    - ensemble에 들어가는 retriever의 경우 vectorstore retriever(search_type : mmr)과 bm_25를 사용
+
+- langchain
+  - retriever를 사용하면서 이전 대화 내용도 기억하게 해야함
+    - 그러기 위해서 대화 내용을 store에 저장 후 프롬프트를 통해 활용하게 함
+    - 

@@ -24,7 +24,7 @@ class vectordb():
         return loaded_db
     
     def db_ret(self, db, k):
-        db_retriever = db.as_retriever(search_kwargs = {"k" : k})
+        db_retriever = db.as_retriever(search_type = 'mmr', search_kwargs = {"k" : k})
         return db_retriever
     
     def bm_ret(self, data, k):

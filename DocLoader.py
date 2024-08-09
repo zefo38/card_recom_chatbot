@@ -32,7 +32,7 @@ class docload():
         loader = DirectoryLoader(self.d_path, glob = glob, loader_cls = loader_cls, silent_errors = silent_errors, loader_kwargs = loader_kwargs)
         d_data = loader.load()
         return d_data
-    
+        
     def split_text(self, t_data, chunk_size, chunk_overlap):
         spliter = RecursiveCharacterTextSplitter(chunk_size = chunk_size, chunk_overlap = chunk_overlap)
         if isinstance(t_data, str) == False:
