@@ -1,6 +1,7 @@
 *.csv
 *.json
 *.safetensors
+*.txt
 __pycache__/
 basic_model/
 intent_data/
@@ -22,3 +23,4 @@ customer_txt_file/
 faiss_db/
 *.pdf
 Faiss_DB/
+customer_id_1/

@@ -1,7 +1,7 @@
 import csv
 
-csv_file_path = './card_data/card_benefit.csv'
-txt_file_path = './card_data/card_benefit.txt'
+csv_file_path = './customer_id_1/card_benefit.csv'
+txt_file_path = './customer_id_1/card_benefit.txt'
 
 card_description_template = "{card_name} 카드는 {category} 카테고리에서 {min_spend}원 이상을 썼을 경우 {discount_amount}원이 할인됩니다. 할인 한도는 {discount_limit}원이고, 할인 금액 제공 기준은 {discount_basis}원입니다. 월 이용수는 {usage_limit}입니다. 이 카드는 {card_type} 입니다.\n"
 
