@@ -37,13 +37,14 @@ account_chain = chain.get_rag_history()
 
 st.title("Simple Chat")
 
-input = st.text_input("You:")
-
-def get_response(input):
-    responses = account_chain.invoke({"question" : input}, config = {"configurable" : {"session_id" : session_ids}})
-    return responses
-
-
+def get_response(user_input):
+    responses = account_chain.invoke({"question": user_input}, config={"configurable": {"session_id": session_ids}})
+    st.write(responses)
+    if isinstance(responses, str):
+        response_text = responses
+    else:
+        response_text = responses.get("output_text", "응답을 처리하는 중 문제가 발생했습니다.")
+    return response_text
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -53,11 +54,11 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 if prompt := st.chat_input("메시지를 입력하세요"):
-    st.session_state.messages.append({"role": "user", "content": input})
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(input)
+        st.markdown(prompt)
 
-    response = get_response(input)
+    response = get_response(prompt)
     st.session_state.messages.append({"role": "assistant", "content": response})
     with st.chat_message("assistant"):
         st.markdown(response)
