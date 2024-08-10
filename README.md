@@ -38,9 +38,25 @@
       - 그래야만 더 개인화된 서비스 구현이 가능
       - 개인정보 유출 문제 방지도 가능해짐
       - 또한 각 DB마다 카드 정보와 카드 추천 시스템 관련 정보도 함께 들어있음
-      
+
 
 - langchain
   - retriever를 사용하면서 이전 대화 내용도 기억하게 해야함
     - 그러기 위해서 대화 내용을 store에 저장 후 프롬프트를 통해 활용하게 함
 
+### 코드
+- DocLoader.py
+  - 데이터 로드 및 split, embedding 메소드가 포함된 클래스
+  - 이 클래스를 통해 위의 작업들을 모듈화
+
+- RAG_VectorDB.py
+  - 벡터DB 생성, Retriever 생성, DB저장, 로드, merge 메소드가 있음
+  - Retriever는 BM_25, vectorstore retriever, ensemble 세가지 생성 가능
+
+- RAGChain.py
+  - 체인을 생성
+  - 또한 세션 히스토리를 저장해 챗봇이 활용 가능하게 해줌
+
+- CSV2TXT.py
+  - csv파일을 텍스트 파일로 변환
+  - 고객 가계부 데이터를 텍스트로 변환해줌

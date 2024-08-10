@@ -20,6 +20,5 @@ consume_data/
 test_db2/
 txt_file/
 customer_txt_file/
-faiss_db/
 *.pdf
 customer_id_1/
