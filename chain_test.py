@@ -1,4 +1,3 @@
-from langchain_model import chat_chain
 from DocLoader import docload
 from RAG_VectorDB import vectordb
 import langchain
