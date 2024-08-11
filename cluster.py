@@ -7,8 +7,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 @st.cache_resource
 def load_data():
-    df_transactions = pd.read_csv('card\card_transaction2.csv')
-    credit = pd.read_csv('card\card2.csv')
+    df_transactions = pd.read_csv('./card/card_transaction2.csv')
+    credit = pd.read_csv('./card/card2.csv')
     return df_transactions, credit
 
 

@@ -3,8 +3,8 @@ import streamlit as st
 import pandas as pd
 
 def data():
-    df_transactions = pd.read_csv('card\card_transaction2.csv')
-    card_benefit_df = pd.read_csv('card\card2.csv')
+    df_transactions = pd.read_csv('./card/card_transaction2.csv')
+    card_benefit_df = pd.read_csv('./card/card2.csv')
     df_transactions = df_transactions.loc[df_transactions['고객번호'] == 40]
 
     df_transactions['날짜'] = pd.to_datetime(df_transactions['날짜'])
